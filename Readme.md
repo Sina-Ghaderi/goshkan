@@ -96,7 +96,7 @@ see [systemd documention](https://www.freedesktop.org/software/systemd/man/syste
 
 ### api reference documention
 
-get rest api documention in pdf format by sending `GET /` to `HTTPAPI_LISTEN` address, or [find it](https://github.com/sina-ghaderi/goshkan/apid/api.pdf) under `goshkan/apid/` directory.  
+get rest api documention in pdf format by sending `GET /` to `HTTPAPI_LISTEN` address, or [find it](https://github.com/Sina-Ghaderi/goshkan/blob/main/apid/api.pdf) under `goshkan/apid/` directory.  
 this is open api without authentication, you shouldn't expose it to public, nginx or apache can protect this api with basic http authentication.
 
 ### security notice
