@@ -88,7 +88,7 @@ note: after this you can't serve another service on this address (192.168.122.14
 but the best solution would be to bind your services with another ip-address or interface.
 
 ```
-iptables -t nat -A PREROUTING -i ens3 -d 192.168.122.149 -p tcp -m tcp --dport 1:65534 -j REDIRECT --to-ports 8443
+iptables -t nat -A PREROUTING -i ens3 -d 192.168.122.149 -p tcp -m tcp --dport 1:65535 -j REDIRECT --to-ports 8443
 ```
 
 ### max open files on linux
