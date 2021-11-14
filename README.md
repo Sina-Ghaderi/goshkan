@@ -21,7 +21,7 @@ required. on debian mariadb server can be installed by executing `apt install ma
 remember to run `mysql_secure_installation` after installation to secure your sql server.  
 
 now its time to create database, user and tables. in order to do this you need to login to mysql with root user: `mysql -u root`  and on mysql shell run these commands: (you should change username and password)
-```
+```sql
 CREATE DATABASE Goshkan;
 CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON Goshkan.* TO 'username'@'localhost';
@@ -104,14 +104,7 @@ this is open api without authentication, you shouldn't expose it to public, ngin
 #### contribute to this project
 feel free to email me <sina@snix.ir> if you want to contribute to this project
 
-```
-// Copyright 2021 SNIX LLC sina@snix.ir
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 2 as published by the Free Software Foundation.
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-```
+Copyright 2021 SNIX LLC sina@snix.ir  
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 2 as published by the Free Software Foundation.  
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
