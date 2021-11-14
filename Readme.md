@@ -65,10 +65,10 @@ default config file content:
 `MYSQL_ADDRESS`:  mysql server address and port, default port `3306` (string `host:port`)  
 `CONNECT_TIMEOUT`: connect to upstream server connection timeout in second (integer > 0)  
 `CLIENT_TIMEOUT`: client connection timeout in second (integer > 0)  
-`LISTEN_ADDRESS`: tls/http proxy listen address and port (string `addr:port`)  
-`HTTPAPI_LISTEN`: http rest api listen address and port (string `addr:port`)  
 `DOMAIN_MEMTTL`: in memory domain cache aging time in second, value 0 disable this 
 functionality (integer >= 0)  
+`LISTEN_ADDRESS`: tls/http proxy listen address and port (string `addr:port`)  
+`HTTPAPI_LISTEN`: http rest api listen address and port (string `addr:port`)  
 `LOGS_DEBUGGING`: debugging enable (boolean `true|false`)  
 
 
