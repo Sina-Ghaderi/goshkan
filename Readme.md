@@ -22,11 +22,11 @@ remember to run `mysql_secure_installation` after installation to secure your sq
 
 now its time to create database, user and tables. in order to do this you need to login to mysql with root user: `mysql -u root`  and on mysql shell run these commands: (remember to change username and password)
 ```sql
-CREATE DATABASE Goshkan;
+CREATE DATABASE goshkan;
 CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON Goshkan.* TO 'username'@'localhost';
+GRANT ALL PRIVILEGES ON goshkan.* TO 'username'@'localhost';
 
-CREATE TABLE Goshkan.regext (
+CREATE TABLE goshkan.regext (
 	regexid INT UNSIGNED auto_increment NOT NULL,
 	regexstr LONGTEXT NOT NULL,
 	PRIMARY KEY (regexid)
