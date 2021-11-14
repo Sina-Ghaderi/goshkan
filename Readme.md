@@ -9,13 +9,13 @@ Transparent TLS and HTTP proxy serve &amp; operating on all 65535 ports, with do
 - DNAT friendly, find client actual dst port from conntrack table
 - written with golang standard packages (except mysql-driver)
 
-#### compile from source
+### compile from source
 clone this project, use `git clone https://github.com/Sina-Ghaderi/goshkan.git`  
 goshkan written with golang, so you need to install compiler `apt install golang`  
 finally run `go build` on project root directory to compile source code.  
 FYI: pre-compiled goshkan binary is available at [Releases](https://github.com/Sina-Ghaderi/goshkan/releases)
 
-#### required dependency
+### required dependency
 first of all, goshkan uses mysql server to store regex patterns, so mysql or mariadb server is 
 required. on debian mariadb server can be installed by executing `apt install mariadb-server`  
 remember to run `mysql_secure_installation` after installation to secure your sql server.  
@@ -40,7 +40,7 @@ EXIT;
 ```
 thats it, mysql installation is completed now. note: if you planning to host mysql and goshkan on separate servers, you should change `localhost` to goshkan server address.
 
-#### configuration file
+### configuration file
 configuration file is based on json, the default configuration file path is `./server-config.json`
 for using another file as config, you should specify --config flag: `goshkan --config <path/to/file>`
 
@@ -79,7 +79,7 @@ in nutshell time complexity is the amount of time taken by an algorithm to run, 
 domains and addresses would be stored in memory with a timer, when this timer elapsed, domain or address will be removed from memory (age-out)  unless new connection with this domain/address established before that. in this case, the timer will be reset. `DOMAIN_MEMTTL` value indicate this timer time duration (in second). if `DOMAIN_MEMTTL` is 0 memory cache functionality would be disabled entirely.  
 you should enable it if your server have decent amount of memory (a.k.a RAM)
 
-#### iptables redirect all ports
+### iptables redirect all ports
 forwarding all ports to goshkan with iptables redirect:  
 this command would redirect all tcp packets (on all ports) to goshkan proxy port if packet destination address is 192.168.122.149 and input interface is ens3  
 
@@ -90,19 +90,19 @@ but the best solution would be to bind your services with another ip-address or 
 iptables -t nat -A PREROUTING -i ens3 -d 192.168.122.149 -p tcp -m tcp --dport 1:65534 -j REDIRECT --to-ports 8443
 ```
 
-#### max open files on linux
+### max open files on linux
 by default goshkan can open max 1024 file (connection), if its not enough change this value in systemd service file or with `ulimit` command.  
 see [systemd documention](https://www.freedesktop.org/software/systemd/man/systemd.service.html) and [ulimit manual](https://linuxcommand.org/lc3_man_pages/ulimith.html)
 
-#### api reference documention
+### api reference documention
 
 get rest api documention in pdf format by sending `GET /` to `HTTPAPI_LISTEN` address, or [find it](https://github.com/sina-ghaderi/goshkan/apid/api.pdf) under `goshkan/apid/` directory.  
 this is open api without authentication, you shouldn't expose it to public, nginx or apache can protect this api with basic http authentication.
 
-#### security notice
+### security notice
 - do NOT add regex pattern that allows `localhost` , `127.0.0.1` or any of your server ip-address or domains. can cause server connection loop or exposing internal server resources to unauthorized users.
 
-#### contribute to this project
+### contribute to this project
 feel free to email me <sina@snix.ir> if you want to contribute to this project
 
 Copyright 2021 SNIX LLC sina@snix.ir  
