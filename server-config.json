@@ -1,0 +1,12 @@
+{
+    "MYSQL_PASSWORD": "password",
+    "MYSQL_USERNAME": "username",
+    "DOMAIN_MEMTTL": 60,
+    "MYSQL_DATABASE": "goshkan",
+    "MYSQL_ADDRESS": "localhost",
+    "CONNECT_TIMEOUT": 10,
+    "LISTEN_ADDRESS": "192.168.122.149:8443",
+    "CLIENT_TIMEOUT": 15,
+    "HTTPAPI_LISTEN": "127.0.0.1:8080",
+    "LOGS_DEBUGGING": true
+}
