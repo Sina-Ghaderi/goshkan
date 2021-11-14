@@ -67,9 +67,10 @@ default config file content:
 `CLIENT_TIMEOUT`: client connection timeout in second (integer > 0)  
 `LISTEN_ADDRESS`: tls/http proxy listen address and port (string `addr:port`)  
 `HTTPAPI_LISTEN`: http rest api listen address and port (string `addr:port`)  
-`LOGS_DEBUGGING`: debugging enable (boolean `true|false`)  
 `DOMAIN_MEMTTL`: in memory domain cache aging time in second, value 0 disable this 
 functionality (integer >= 0)  
+`LOGS_DEBUGGING`: debugging enable (boolean `true|false`)  
+
 
 summary about  `DOMAIN_MEMTTL`:   
 goshkan uses in memory cache (hashtable) to store recently connected domains and addresses, the reason for this is to reduce time complexity.  
