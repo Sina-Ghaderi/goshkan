@@ -11,7 +11,7 @@ Transparent TLS and HTTP proxy serve &amp; operating on all 65535 ports, with do
 
 ### compile from source
 clone this project, use `git clone https://github.com/Sina-Ghaderi/goshkan.git`  
-mirror snix repository: `gti clone https://git.snix.ir/goshkan`
+mirror snix repository: `gti clone https://git.snix.ir/goshkan`  
 goshkan written with golang, so you need to install compiler `apt install golang`  
 finally run `go build` on project root directory to compile source code.  
 FYI: pre-compiled goshkan binary is available at [Releases](https://github.com/Sina-Ghaderi/goshkan/releases)
