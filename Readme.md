@@ -20,7 +20,7 @@ first of all, goshkan uses mysql server to store regex patterns, so mysql or mar
 required. on debian mariadb server can be installed by executing `apt install mariadb-server`  
 remember to run `mysql_secure_installation` after installation to secure your sql server.  
 
-now its time to create database, user and tables. in order to do this you need to login to mysql with root user: `mysql -u root`  and on mysql shell run these commands: (you should change username and password)
+now its time to create database, user and tables. in order to do this you need to login to mysql with root user: `mysql -u root`  and on mysql shell run these commands: (remember to change username and password)
 ```sql
 CREATE DATABASE Goshkan;
 CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
