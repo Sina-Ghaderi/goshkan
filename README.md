@@ -8,6 +8,7 @@ feature:
 - oprate on all ports (with iptables redirect)
 - rest api for add/delete domains
 - DNAT friendly, find client actual dst port from conntrack table
+- written with golang standard packages (except mysql-driver)
 
 
 
