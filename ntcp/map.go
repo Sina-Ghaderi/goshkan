@@ -33,7 +33,7 @@ func setupCache() {
 		opts.SYSLOG(disabledMAP)
 		allowedOrNot = func(domain string) bool { return rgxp.RegexpCompiled().MatchString(domain) }
 		storeToMap = func(domain string) {}
-		RemoveFromMap = func(ptrn string) error { return nil }
+		RemoveFromMap = func(ptrn *string) error { return nil }
 
 		return
 	}
@@ -73,8 +73,8 @@ func cleanerMap(tk *time.Ticker, dm string, chtr <-chan struct{}) {
 
 }
 
-var RemoveFromMap = func(ptrn string) error {
-	re, err := regexp.Compile(ptrn)
+var RemoveFromMap = func(ptrn *string) error {
+	re, err := regexp.Compile(*ptrn)
 	if err != nil {
 		return err // somthing is wrong!
 	}
