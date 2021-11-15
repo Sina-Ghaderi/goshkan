@@ -75,7 +75,7 @@ functionality (integer >= 0)
 
 summary about  `DOMAIN_MEMTTL`:   
 goshkan uses in memory cache (hashtable) to store recently connected domains and addresses, the reason for this is to reduce time complexity.  
-in nutshell time complexity is the amount of time taken by an algorithm to run, which in this case is regex matching algorithm. when client connect to upstream host, goshkan store matched upstream address or domain in memory, so for next upcoming connection doesn't have to go through regex matching algorithm, instead uses hashtable with time complexity of O(1). 
+in nutshell time complexity is the amount of time taken by an algorithm to run, which in this case is regex matching algorithm. when client connect to upstream host, goshkan store matched upstream address or domain in memory, so for next upcoming connection doesn't have to go through regex matching again, instead uses hashtable with time complexity of O(1). 
 
 domains and addresses would be stored in memory with a timer, when this timer elapsed, domain or address will be removed from memory (age-out)  unless new connection with this domain/address established before that. in this case, the timer will be reset. `DOMAIN_MEMTTL` value indicate this timer time duration (in second). if `DOMAIN_MEMTTL` is 0 memory cache functionality would be disabled entirely.  
 you should enable it if your server have decent amount of memory (a.k.a RAM)
