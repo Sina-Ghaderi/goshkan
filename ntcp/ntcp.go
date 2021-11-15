@@ -259,22 +259,43 @@ func (str *proxyTLS) handleHTTPConn(inConn net.Conn, miss []byte) {
 
 func (pr *httpHostRead) extractHost() (string, error) {
 	var finHost string
-	var notifyc = make(chan struct{})
+	var notifychan = make(chan struct{})
+	var releaseall = make(chan struct{})
 	setHostName = func(r *http.Request) { // change function
-		finHost = r.Host      // pass the variable
-		notifyc <- struct{}{} // notify others when job is done
+		finHost = r.Host         // pass the variable
+		notifychan <- struct{}{} // notify others when job is done
 	}
 
-	comnuichan := make(chan readOnly)                             // http serve, accept once.
-	go http.Serve(listenHandler{chnn: comnuichan}, httpImplmnt{}) // serve the conn
-	comnuichan <- readOnly{reader: pr.te}
-	// put conn on the channel
+	comnuichan := make(chan readOnly) // http serve, accept once.
 
-	<-notifyc              // job is done
-	close(comnuichan)      // close chan to break http serve
+	// issue: non-http connection stuck on http proxy, bcz protocol is not http
+	// connection would be closed before setHostName runs and send notify on notifyc.
+
+	srv := &http.Server{
+		Handler: httpImplmnt{},
+		ConnState: func(c net.Conn, cs http.ConnState) {
+			if cs == 4 { // 4 == connection closed
+				select {
+				case notifychan <- struct{}{}:
+				case <-releaseall:
+				}
+			}
+		},
+	}
+
+	go srv.Serve(listenHandler{chnn: comnuichan})
+
+	// put conn on the channel
+	comnuichan <- readOnly{reader: pr.te}
+
+	<-notifychan      // job is done
+	close(releaseall) // release ConnState function
+	close(comnuichan) // close chan to break http serve
+
 	if len(finHost) == 0 { // check finHost
 		return finHost, errors.New(errorNoHost)
 	}
+
 	return finHost, nil
 }
 
