@@ -11,6 +11,7 @@ Transparent TLS and HTTP proxy serve &amp; operating on all 65535 ports, with do
 
 ### compile from source
 clone this project, use `git clone https://github.com/Sina-Ghaderi/goshkan.git`  
+mirror snix repository: `gti clone https://git.snix.ir/goshkan`  
 goshkan written with golang, so you need to install compiler `apt install golang`  
 finally run `go build` on project root directory to compile source code.  
 FYI: pre-compiled goshkan binary is available at [Releases](https://github.com/Sina-Ghaderi/goshkan/releases)
@@ -65,16 +66,16 @@ default config file content:
 `MYSQL_ADDRESS`:  mysql server address and port, default port `3306` (string `host:port`)  
 `CONNECT_TIMEOUT`: connect to upstream server connection timeout in second (integer > 0)  
 `CLIENT_TIMEOUT`: client connection timeout in second (integer > 0)  
-`LISTEN_ADDRESS`: tls/http proxy listen address and port (string `addr:port`)  
-`HTTPAPI_LISTEN`: http rest api listen address and port (string `addr:port`)  
 `DOMAIN_MEMTTL`: in memory domain cache aging time in second, value 0 disable this 
 functionality (integer >= 0)  
+`LISTEN_ADDRESS`: tls/http proxy listen address and port (string `addr:port`)  
+`HTTPAPI_LISTEN`: http rest api listen address and port (string `addr:port`)  
 `LOGS_DEBUGGING`: debugging enable (boolean `true|false`)  
 
 
 summary about  `DOMAIN_MEMTTL`:   
 goshkan uses in memory cache (hashtable) to store recently connected domains and addresses, the reason for this is to reduce time complexity.  
-in nutshell time complexity is the amount of time taken by an algorithm to run, which in this case is regex matching algorithm. when client connect to upstream host, goshkan store matched upstream address or domain in memory, so for next upcoming connection doesn't have to go through regex matching algorithm, instead uses hashtable with time complexity of O(1). 
+in nutshell time complexity is the amount of time taken by an algorithm to run, which in this case is regex matching algorithm. when client connect to upstream host, goshkan store matched upstream address or domain in memory, so for next upcoming connection doesn't have to go through regex matching again, instead uses hashtable with time complexity of O(1). 
 
 domains and addresses would be stored in memory with a timer, when this timer elapsed, domain or address will be removed from memory (age-out)  unless new connection with this domain/address established before that. in this case, the timer will be reset. `DOMAIN_MEMTTL` value indicate this timer time duration (in second). if `DOMAIN_MEMTTL` is 0 memory cache functionality would be disabled entirely.  
 you should enable it if your server have decent amount of memory (a.k.a RAM)
@@ -87,7 +88,7 @@ note: after this you can't serve another service on this address (192.168.122.14
 but the best solution would be to bind your services with another ip-address or interface.
 
 ```
-iptables -t nat -A PREROUTING -i ens3 -d 192.168.122.149 -p tcp -m tcp --dport 1:65534 -j REDIRECT --to-ports 8443
+iptables -t nat -A PREROUTING -i ens3 -d 192.168.122.149 -p tcp -m tcp --dport 1:65535 -j REDIRECT --to-ports 8443
 ```
 
 ### max open files on linux
@@ -96,7 +97,7 @@ see [systemd documention](https://www.freedesktop.org/software/systemd/man/syste
 
 ### api reference documention
 
-get rest api documention in pdf format by sending `GET /` to `HTTPAPI_LISTEN` address, or [find it](https://github.com/sina-ghaderi/goshkan/apid/api.pdf) under `goshkan/apid/` directory.  
+get rest api documention in pdf format by sending `GET /` to `HTTPAPI_LISTEN` address, or [find it](https://github.com/Sina-Ghaderi/goshkan/blob/main/apid/api.pdf) under `goshkan/apid/` directory.  
 this is open api without authentication, you shouldn't expose it to public, nginx or apache can protect this api with basic http authentication.
 
 ### security notice
