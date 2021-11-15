@@ -31,9 +31,9 @@ func setupCache() {
 	switch opts.Settings.Clearc {
 	case 0: // zero map ttl, disable map cache
 		opts.SYSLOG(disabledMAP)
-		allowedOrNot = func(domain *string) bool { return rgxp.RegexpCompiled().MatchString(*domain) }
-		storeToMap = func(domain *string) {}
-		RemoveFromMap = func(ptrn *string) error { return nil }
+		allowedOrNot = func(domain string) bool { return rgxp.RegexpCompiled().MatchString(domain) }
+		storeToMap = func(domain string) {}
+		RemoveFromMap = func(ptrn string) error { return nil }
 
 		return
 	}
@@ -41,7 +41,7 @@ func setupCache() {
 	cleanint = time.Duration(opts.Settings.Clearc) * time.Second
 }
 
-var storeToMap = func(domain *string) {
+var storeToMap = func(domain string) {
 	if ttl, ok := inMemMap.Load(domain); ok {
 		ttl.(memoryTTL).ticker.Reset(cleanint) // renew domain age.
 		return
@@ -58,13 +58,12 @@ var storeToMap = func(domain *string) {
 			return errors.New(errorChanNk)
 		}
 	}
-	// you may asking: is it safe to use pointer as key in map?
-	// it is as long as you dont mess pointers with unsafe package.
+
 	inMemMap.Store(domain, memoryTTL{ticker: tk, stopfc: fn}) // add data to map
 	go cleanerMap(tk, domain, ch)                             // run cleaner
 }
 
-func cleanerMap(tk *time.Ticker, dm *string, chtr <-chan struct{}) {
+func cleanerMap(tk *time.Ticker, dm string, chtr <-chan struct{}) {
 	select {
 	case <-tk.C: // age out, remove form map
 	case <-chtr: // signal by user, remove from map
@@ -74,14 +73,14 @@ func cleanerMap(tk *time.Ticker, dm *string, chtr <-chan struct{}) {
 
 }
 
-var RemoveFromMap = func(ptrn *string) error {
-	re, err := regexp.Compile(*ptrn)
+var RemoveFromMap = func(ptrn string) error {
+	re, err := regexp.Compile(ptrn)
 	if err != nil {
 		return err // somthing is wrong!
 	}
 
 	rgtask := func(key interface{}, value interface{}) bool {
-		if re.MatchString(*key.(*string)) {
+		if re.MatchString(key.(string)) {
 			if err := value.(memoryTTL).stopfc(); err != nil {
 				opts.SYSLOG(err)
 			} // remove domain from map
@@ -93,12 +92,12 @@ var RemoveFromMap = func(ptrn *string) error {
 	return err
 }
 
-var allowedOrNot = func(domain *string) bool {
+var allowedOrNot = func(domain string) bool {
 	// check memory cache first -> O(1)
 	if _, ok := inMemMap.Load(domain); ok {
 		return ok
 	}
 
 	// this take time, but we can do nothing about it :/
-	return rgxp.RegexpCompiled().MatchString(*domain)
+	return rgxp.RegexpCompiled().MatchString(domain)
 }

@@ -164,7 +164,7 @@ func (str *proxyTLS) handleTLSConn(inConn net.Conn, miss []byte) {
 		return
 	}
 
-	if !allowedOrNot(&header) {
+	if !allowedOrNot(header) {
 		opts.CONNEC(domainNotOk, inConn.RemoteAddr().String())
 		return
 	}
@@ -184,7 +184,7 @@ func (str *proxyTLS) handleTLSConn(inConn net.Conn, miss []byte) {
 
 	opts.CONNEC(clientConn, dstaddr) // debug logging, if enabled
 
-	storeToMap(&header) // cache domain in memory map
+	storeToMap(header) // cache domain in memory map
 
 	defer outConn.Close()
 	// read and write on connections, exchange data...
@@ -239,7 +239,7 @@ func (str *proxyTLS) handleHTTPConn(inConn net.Conn, miss []byte) {
 		tmpdtt = header[:pindex] // cut port from host, for regex check
 	}
 
-	if !allowedOrNot(&tmpdtt) {
+	if !allowedOrNot(tmpdtt) {
 		opts.CONNEC(domainNotOk, inConn.RemoteAddr().String())
 		return
 	}
@@ -252,7 +252,7 @@ func (str *proxyTLS) handleHTTPConn(inConn net.Conn, miss []byte) {
 
 	opts.CONNEC(clientConn, header) // debug logging, if enabled
 
-	storeToMap(&tmpdtt) // cache in memory
+	storeToMap(tmpdtt) // cache in memory
 	defer outConn.Close()
 	readAndwrite(inConn, outConn, fread)
 }
