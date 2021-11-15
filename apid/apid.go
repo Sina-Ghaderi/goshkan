@@ -226,7 +226,7 @@ func deltRegxOK(w http.ResponseWriter, r *http.Request, delreg *string) {
 		w.Write([]byte(err.Error()))
 		return
 	}
-	if err := ntcp.RemoveFromMap(delreg); err != nil {
+	if err := ntcp.RemoveFromMap(*delreg); err != nil {
 		opts.APIDBG(err, r.RemoteAddr, r.RequestURI)
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
