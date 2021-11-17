@@ -13,6 +13,7 @@ package rgdb
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"goshkan/opts"
 )
@@ -73,8 +74,8 @@ func (d *MariaSQLDB) DeleteRegex(ctx context.Context, rgid uint) error {
 	return err
 }
 
-func (d *MariaSQLDB) AddNewRegex(ctx context.Context, rgst string) error {
-	_, err := d.Handler.ExecContext(ctx, sqlInsert, rgst)
+func (d *MariaSQLDB) AddNewRegex(ctx context.Context, rgst *string) error {
+	_, err := d.Handler.ExecContext(ctx, sqlInsert, *rgst)
 	return err
 }
 
@@ -82,4 +83,13 @@ func (d *MariaSQLDB) GetRegexByID(ctx context.Context, rgid uint) (*string, erro
 	regex := new(string)
 	err := d.Handler.QueryRowContext(ctx, sqlRgByID, rgid).Scan(regex)
 	return regex, err
+}
+
+func (d *MariaSQLDB) RegexIFExist(ctx context.Context, ptrn *string) error {
+	var esd bool
+	err := d.Handler.QueryRowContext(ctx, sqlExistX, *ptrn).Scan(&esd)
+	if err == nil && esd {
+		return errors.New(regexExtin)
+	}
+	return err
 }

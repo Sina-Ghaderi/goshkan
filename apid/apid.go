@@ -151,7 +151,7 @@ func (pr *ApiHandler) addNewRegexp(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	middle := newapiListRegex(ctx)
-	go middle.saveRegexToDB(pr.database, input.Regex)
+	go middle.saveRegexToDB(pr.database, &input.Regex)
 
 	select {
 	case err := <-middle.err:

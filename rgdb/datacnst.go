@@ -22,8 +22,13 @@ const (
 )
 
 const (
+	regexExtin = "err: this pattern already exists in database"
+)
+
+const (
 	sqlSelect = "SELECT regexid, regexstr FROM regext"
 	sqlRgByID = "SELECT regexstr from regext where regexid=?"
 	sqlDelete = "DELETE FROM regext WHERE regexid=?"
+	sqlExistX = "SELECT EXISTS(SELECT * FROM regext WHERE regexstr=?)"
 	sqlInsert = "INSERT INTO regext (regexstr) VALUES (?)"
 )

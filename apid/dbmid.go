@@ -38,7 +38,12 @@ func (pr *apiMiddRegex) loadAllRegexCTX(h *rgdb.MariaSQLDB) {
 
 }
 
-func (pr *apiMiddRegex) saveRegexToDB(h *rgdb.MariaSQLDB, ptrn string) {
+func (pr *apiMiddRegex) saveRegexToDB(h *rgdb.MariaSQLDB, ptrn *string) {
+	if err := h.RegexIFExist(pr.ctx, ptrn); err != nil {
+		pr.errorOrCancel(err)
+		return
+	}
+
 	if err := h.AddNewRegex(pr.ctx, ptrn); err != nil {
 		pr.errorOrCancel(err)
 		return
