@@ -39,7 +39,6 @@ func newLogger() *loggersrv {
 
 var (
 	TLSLOG func(...interface{}) // TLSLOG logs tls server stuff
-	CONNEC func(...interface{}) // CONNEC logs client connections, if debug is true
 	SYSLOG func(...interface{})
 	OSEXIT func(...interface{}) // EXIT APP
 	CONFIG func(...interface{})
@@ -47,10 +46,11 @@ var (
 	MYSQLO func(...interface{}) // Mysql info
 	APISRV func(...interface{})
 	APIERR func(...interface{})
-	APIDBG func(...interface{})
+        // Debug functions, no-op func non-nil
+	APIDBG = func(...interface{}){}
+        CONNEC = func(...interface{}){}
 )
 
-// start logging service for this server, if not running at start, server logging would be disabled
 func (lg *loggersrv) initOptsLogs() {
 	// new loggers for server handlers, with custom prefix
 	TLSLOG = func(l ...interface{}) { lg.tcplog.Println(l...) }
@@ -61,8 +61,6 @@ func (lg *loggersrv) initOptsLogs() {
 	MYSQLO = func(l ...interface{}) { lg.mysqld.Println(l...) }
 	APIERR = func(l ...interface{}) { lg.apisrv.Fatalln(l...) }
 	APISRV = func(l ...interface{}) { lg.apisrv.Println(l...) }
-        CONNEC = func(l ...interface{}) {}
-	APIDBG = func(l ...interface{}) {}
 }
 
 func (lg *loggersrv) debugging() {
