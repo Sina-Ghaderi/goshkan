@@ -61,6 +61,8 @@ func (lg *loggersrv) initOptsLogs() {
 	MYSQLO = func(l ...interface{}) { lg.mysqld.Println(l...) }
 	APIERR = func(l ...interface{}) { lg.apisrv.Fatalln(l...) }
 	APISRV = func(l ...interface{}) { lg.apisrv.Println(l...) }
+        CONNEC = func(l ...interface{}) {}
+	APIDBG = func(l ...interface{}) {}
 }
 
 func (lg *loggersrv) debugging() {
