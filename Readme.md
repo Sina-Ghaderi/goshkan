@@ -1,7 +1,7 @@
 # goshkan
 Transparent TLS and HTTP proxy serve &amp; operating on all 65535 ports, with domain regex whitelist and rest api control
 
-- tls and http on same port (peyload inspection)
+- tls and http on same port (payload inspection)
 - handle connections with low memory footprint
 - regex domain filtering 
 - oprate on all ports (with iptables redirect)
