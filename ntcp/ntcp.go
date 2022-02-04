@@ -81,17 +81,12 @@ func (rc *httpHostRead) setIoWriter(wr io.Writer) { rc.te = io.TeeReader(rc.re, 
 func (rc *sniTLSLoadHs) setIoWriter(wr io.Writer) { rc.te = io.TeeReader(rc.re, wr) }
 
 type forgeReader struct {
-	reader  io.Reader
-	missing []byte
+	reader io.Reader
+	missig io.Reader
 }
 
 func (p *forgeReader) Read(b []byte) (int, error) {
-	n, err := p.reader.Read(b)
-	if err != nil {
-		return n, err
-	}
-	copy(b, append(p.missing, b...))
-	return n + len(p.missing), err
+	return io.MultiReader(p.missig, p.reader).Read(b)
 }
 
 func NewProxy() *proxyTLS {
@@ -153,7 +148,8 @@ func (str *proxyTLS) handleTLSConn(inConn net.Conn, miss []byte) {
 	}
 
 	header, fread, err := peekClientHost(
-		&sniTLSLoadHs{re: &forgeReader{reader: inConn, missing: miss}})
+		&sniTLSLoadHs{re: &forgeReader{
+			reader: inConn, missig: bytes.NewReader(miss)}})
 	if err != nil {
 		opts.CONNEC(err, inConn.RemoteAddr().String())
 		return
@@ -218,7 +214,9 @@ func (str *proxyTLS) handleHTTPConn(inConn net.Conn, miss []byte) {
 	}
 
 	header, fread, err := peekClientHost(
-		&httpHostRead{re: &forgeReader{reader: inConn, missing: miss}})
+		&httpHostRead{re: &forgeReader{
+			reader: inConn, missig: bytes.NewReader(miss),
+		}})
 	if err != nil {
 		opts.CONNEC(err, inConn.RemoteAddr().String())
 		return
