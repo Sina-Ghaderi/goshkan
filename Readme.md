@@ -1,5 +1,5 @@
 # goshkan
-Transparent TLS and HTTP proxy serve &amp; operating on all 65535 ports, with domain regex whitelist and rest api control
+Transparent TLS and HTTP proxy serve &amp; operates on all 65535 ports, with domain regex whitelist and rest api control
 
 - tls and http on same port (payload inspection)
 - handle connections with low memory footprint
@@ -13,7 +13,7 @@ Transparent TLS and HTTP proxy serve &amp; operating on all 65535 ports, with do
 clone this project, use `git clone https://github.com/Sina-Ghaderi/goshkan.git`  
 mirror snix repository: `gti clone https://git.snix.ir/goshkan`  
 goshkan written with golang, so you need to install compiler `apt install golang`  
-finally run `go build` on project root directory to compile source code.  
+finally run `go build` on project root directory to compile the source code.  
 FYI: pre-compiled goshkan binary is available at [Releases](https://github.com/Sina-Ghaderi/goshkan/releases)
 
 ### required dependency
