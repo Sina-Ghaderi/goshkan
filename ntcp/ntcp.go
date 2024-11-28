@@ -14,12 +14,26 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
-	"goshkan/opts"
+	"goshkan/options"
 	"io"
 	"net"
 	"net/http"
 	"sync"
 	"time"
+)
+
+const (
+	domainNotOk = "client trying to connect to blocked domain, killing conn"
+)
+
+const (
+	addPortAddr      = ":80"
+	noneAddress      = "none"
+	tcpNetConnection = "tcp"
+)
+
+const (
+	clientConn = "connected to upstream server, address:"
 )
 
 type proxyTLS struct {
@@ -90,9 +104,9 @@ func (p *forgeReader) Read(b []byte) (int, error) {
 }
 
 func NewProxy() *proxyTLS {
-	sokaddr := opts.Settings.SockAd
-	readout := opts.Settings.Conout
-	timeout := opts.Settings.ToutCl
+	sokaddr := options.Settings.SockAddr
+	readout := options.Settings.ConnOut
+	timeout := options.Settings.InTimeout
 	return &proxyTLS{
 		server: sokaddr,
 		cntout: time.Duration(timeout) * time.Second,
@@ -102,18 +116,18 @@ func NewProxy() *proxyTLS {
 
 func (str *proxyTLS) RunProxy() {
 	go func() {
-		opts.TLSLOG(startProxyd, str.server)
+		options.TLSLOG("starting tls and http proxy, listening on:", str.server)
 		setupCache()
-		soc, err := net.Listen(tcpNetConnc, str.server)
+		soc, err := net.Listen(tcpNetConnection, str.server)
 		if err != nil {
-			opts.OSEXIT(err)
+			options.OSEXIT(err)
 		}
 		defer soc.Close()
 
 		for {
 			conn, err := soc.Accept() // accept incomming connections
 			if err != nil {
-				opts.CONNEC(err)
+				options.CONNEC(err)
 				continue
 			}
 			go str.handleNewConn(conn)
@@ -126,7 +140,7 @@ func (str *proxyTLS) handleNewConn(conn net.Conn) {
 	// setup an small buffer to capture packet signature
 	pktsig := make([]byte, 3)
 	if _, err := conn.Read(pktsig); err != nil {
-		opts.CONNEC(err)
+		options.CONNEC(err)
 		return
 	}
 
@@ -143,7 +157,7 @@ func (str *proxyTLS) handleNewConn(conn net.Conn) {
 
 func (str *proxyTLS) handleTLSConn(inConn net.Conn, miss []byte) {
 	if err := inConn.SetReadDeadline(time.Now().Add(str.cntout)); err != nil {
-		opts.CONNEC(err, inConn.RemoteAddr().String())
+		options.CONNEC(err, inConn.RemoteAddr().String())
 		return
 	}
 
@@ -151,34 +165,34 @@ func (str *proxyTLS) handleTLSConn(inConn net.Conn, miss []byte) {
 		&sniTLSLoadHs{re: &forgeReader{
 			reader: inConn, missig: bytes.NewReader(miss)}})
 	if err != nil {
-		opts.CONNEC(err, inConn.RemoteAddr().String())
+		options.CONNEC(err, inConn.RemoteAddr().String())
 		return
 	}
 
 	if err := inConn.SetReadDeadline(time.Time{}); err != nil {
-		opts.CONNEC(err, inConn.RemoteAddr().String())
+		options.CONNEC(err, inConn.RemoteAddr().String())
 		return
 	}
 
 	if !allowedOrNot(header) {
-		opts.CONNEC(domainNotOk, inConn.RemoteAddr().String())
+		options.CONNEC(domainNotOk, inConn.RemoteAddr().String())
 		return
 	}
 
 	sokOpt, err := networkOpt(inConn) // syscall, get port before redirect
 	if err != nil {
-		opts.CONNEC(err, inConn.RemoteAddr().String())
+		options.CONNEC(err, inConn.RemoteAddr().String())
 		return
 	}
 
 	dstaddr := net.JoinHostPort(header, sokOpt.PortString())
-	outConn, err := net.DialTimeout(tcpNetConnc, dstaddr, str.readot) // outConn
+	outConn, err := net.DialTimeout(tcpNetConnection, dstaddr, str.readot) // outConn
 	if err != nil {
-		opts.CONNEC(err, inConn.RemoteAddr().String())
+		options.CONNEC(err, inConn.RemoteAddr().String())
 		return
 	}
 
-	opts.CONNEC(clientConn, dstaddr) // debug logging, if enabled
+	options.CONNEC(clientConn, dstaddr) // debug logging, if enabled
 
 	storeToMap(header) // cache domain in memory map
 
@@ -209,7 +223,7 @@ func readAndwrite(inConn, outConn net.Conn, buffed io.Reader) {
 func (str *proxyTLS) handleHTTPConn(inConn net.Conn, miss []byte) {
 
 	if err := inConn.SetReadDeadline(time.Now().Add(str.cntout)); err != nil {
-		opts.CONNEC(err, inConn.RemoteAddr().String())
+		options.CONNEC(err, inConn.RemoteAddr().String())
 		return
 	}
 
@@ -218,12 +232,12 @@ func (str *proxyTLS) handleHTTPConn(inConn net.Conn, miss []byte) {
 			reader: inConn, missig: bytes.NewReader(miss),
 		}})
 	if err != nil {
-		opts.CONNEC(err, inConn.RemoteAddr().String())
+		options.CONNEC(err, inConn.RemoteAddr().String())
 		return
 	}
 
 	if err := inConn.SetReadDeadline(time.Time{}); err != nil {
-		opts.CONNEC(err, inConn.RemoteAddr().String())
+		options.CONNEC(err, inConn.RemoteAddr().String())
 		return
 	}
 
@@ -238,17 +252,17 @@ func (str *proxyTLS) handleHTTPConn(inConn net.Conn, miss []byte) {
 	}
 
 	if !allowedOrNot(tmpdtt) {
-		opts.CONNEC(domainNotOk, inConn.RemoteAddr().String())
+		options.CONNEC(domainNotOk, inConn.RemoteAddr().String())
 		return
 	}
 
-	outConn, err := net.DialTimeout(tcpNetConnc, header, str.readot)
+	outConn, err := net.DialTimeout(tcpNetConnection, header, str.readot)
 	if err != nil {
-		opts.CONNEC(err, inConn.RemoteAddr().String())
+		options.CONNEC(err, inConn.RemoteAddr().String())
 		return
 	}
 
-	opts.CONNEC(clientConn, header) // debug logging, if enabled
+	options.CONNEC(clientConn, header) // debug logging, if enabled
 
 	storeToMap(tmpdtt) // cache in memory
 	defer outConn.Close()
@@ -291,7 +305,7 @@ func (pr *httpHostRead) extractHost() (string, error) {
 	close(comnuichan) // close chan to break http serve
 
 	if len(finHost) == 0 { // check finHost
-		return finHost, errors.New(errorNoHost)
+		return finHost, errors.New("unknow client hostname: cannot do anything here, closing conn")
 	}
 
 	return finHost, nil

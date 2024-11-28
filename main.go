@@ -11,17 +11,17 @@
 package main
 
 import (
-	"goshkan/apid"
+	"goshkan/api"
+	"goshkan/database"
 	"goshkan/ntcp"
-	"goshkan/opts"
-	"goshkan/rgdb"
+	"goshkan/options"
 	"goshkan/rgxp"
 )
 
 func main() {
-	opts.OptsInitService()     //logging and configs reader
-	ssq := rgdb.NewDatabase()  // connection to mysql database
-	rgxp.LoadRegexpInit(ssq)   // read all regex pattens from database
-	ntcp.NewProxy().RunProxy() // tls and http proxy service
-	apid.NewApid(ssq).Run()    // run rest api service
+	options.OptsInitService()         //logging and configs reader
+	service := database.NewDatabase() // connection to mysql database
+	rgxp.LoadRegexpInit(service)      // read all regex pattens from database
+	ntcp.NewProxy().RunProxy()        // tls and http proxy service
+	api.NewApid(service).Run()        // run rest api service
 }

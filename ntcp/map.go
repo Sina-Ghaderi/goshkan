@@ -12,7 +12,7 @@ package ntcp
 
 import (
 	"errors"
-	"goshkan/opts"
+	"goshkan/options"
 	"goshkan/rgxp"
 	"regexp"
 	"sync"
@@ -20,25 +20,25 @@ import (
 )
 
 type memoryTTL struct {
-	ticker *time.Ticker // age-out trigger
-	stopfc func() error // delete by user trigger
+	ticker   *time.Ticker // age-out trigger
+	stopfunc func() error // delete by user trigger
 }
 
 var inMemMap sync.Map // safe map
 var cleanint time.Duration
 
 func setupCache() {
-	switch opts.Settings.Clearc {
+	switch options.Settings.ClearTTL {
 	case 0: // zero map ttl, disable map cache
-		opts.SYSLOG(disabledMAP)
+		options.SYSLOG("domain cache time to live is zero, disabling memory cache")
 		allowedOrNot = func(domain string) bool { return rgxp.RegexpCompiled().MatchString(domain) }
 		storeToMap = func(domain string) {}
-		RemoveFromMap = func(ptrn *string) error { return nil }
+		RemoveFromMap = func(*string) error { return nil }
 
 		return
 	}
 
-	cleanint = time.Duration(opts.Settings.Clearc) * time.Second
+	cleanint = time.Duration(options.Settings.ClearTTL) * time.Second
 }
 
 var storeToMap = func(domain string) {
@@ -55,12 +55,12 @@ var storeToMap = func(domain string) {
 		case ch <- struct{}{}:
 			return err
 		default:
-			return errors.New(errorChanNk)
+			return errors.New("cannot terminate domain cleaner task, leaving it in map")
 		}
 	}
 
-	inMemMap.Store(domain, memoryTTL{ticker: tk, stopfc: fn}) // add data to map
-	go cleanerMap(tk, domain, ch)                             // run cleaner
+	inMemMap.Store(domain, memoryTTL{ticker: tk, stopfunc: fn}) // add data to map
+	go cleanerMap(tk, domain, ch)                               // run cleaner
 }
 
 func cleanerMap(tk *time.Ticker, dm string, chtr <-chan struct{}) {
@@ -81,8 +81,8 @@ var RemoveFromMap = func(ptrn *string) error {
 
 	rgtask := func(key interface{}, value interface{}) bool {
 		if re.MatchString(key.(string)) {
-			if err := value.(memoryTTL).stopfc(); err != nil {
-				opts.SYSLOG(err)
+			if err := value.(memoryTTL).stopfunc(); err != nil {
+				options.SYSLOG(err)
 			} // remove domain from map
 		}
 		return true

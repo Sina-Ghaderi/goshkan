@@ -12,10 +12,20 @@ package rgxp
 
 import (
 	"context"
-	"goshkan/opts"
-	"goshkan/rgdb"
+	"goshkan/database"
+	"goshkan/options"
 	"regexp"
 	"strings"
+	"time"
+)
+
+const (
+	readRegex = "parsing domain database and compiling regex string patterns"
+	regMatchN = "a^" // match nothing, this should be in regex pattern.
+)
+
+const (
+	databaseCtxTime = 10 * time.Second
 )
 
 // used from ntcp package (TLS or HTTP connections)
@@ -32,23 +42,23 @@ func compileReg(rwRegex *string) error {
 }
 
 // load all regex from mysql database and compile them
-func LoadRegexpInit(db *rgdb.MariaSQLDB) {
+func LoadRegexpInit(db *database.MariaSQLDB) {
 	ctx, cancel := context.WithTimeout(context.Background(), databaseCtxTime)
 	defer cancel()
 	allReg, err := db.LoadAllRegex(ctx)
 	if err != nil {
-		opts.MYSQLD(err)
+		options.MYSQLD(err)
 	}
 
-	opts.SYSLOG(readRegex)
-	allReg = append(allReg, &rgdb.RegStruct{Regex: regMatchN})
+	options.SYSLOG(readRegex)
+	allReg = append(allReg, &database.RegStruct{Regex: regMatchN})
 
 	for i, rg := range allReg {
 		allReg[i].Regex = "(" + rg.Regex + ")"
 	}
 	ppstr := joinRegexTo(allReg, "|")
 	if err := compileReg(&ppstr); err != nil {
-		opts.OSEXIT(err)
+		options.OSEXIT(err)
 	}
 }
 
@@ -66,7 +76,7 @@ func DelRecompileReg(ptrn *string) error {
 	return compileReg(&cutd)
 }
 
-func joinRegexTo(elems rgdb.RegexList, sep string) string {
+func joinRegexTo(elems database.RegexList, sep string) string {
 	switch len(elems) {
 	case 0:
 		return ""
