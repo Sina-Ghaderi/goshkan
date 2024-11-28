@@ -77,7 +77,7 @@ summary about  `DOMAIN_MEMTTL`:
 goshkan uses in memory cache (hashtable) to store recently connected domains and addresses, the reason for this is to reduce time complexity.  
 in nutshell time complexity is the amount of time taken by an algorithm to run, which in this case is regex matching algorithm. when client connect to upstream host, goshkan store matched upstream address or domain in memory, so for next upcoming connection doesn't have to go through regex matching again, instead uses hashtable with time complexity of O(1). 
 
-domains and addresses would be stored in memory with a timer, when this timer elapsed, domain or address will be removed from memory (age-out)  unless new connection with this domain/address established before that. in this case, the timer will be reset. `DOMAIN_MEMTTL` value indicate this timer time duration (in second). if `DOMAIN_MEMTTL` is 0 memory cache functionality would be disabled entirely.  
+domains and addresses would be stored in memory with a timer, when this timer elapsed, domain or address will be removed from memory (age-out)  unless new connection with this domain/address established before that. in this case, the timer will be reset. `DOMAIN_MEMTTL` value indicate this timer time duration (in second). if `DOMAIN_MEMTTL` set to 0 memory cache functionality would be disabled entirely.  
 you should enable it if your server has decent amount of memory (a.k.a RAM)
 
 ### iptables redirect all ports
@@ -97,7 +97,7 @@ see [systemd documention](https://www.freedesktop.org/software/systemd/man/syste
 
 ### api reference documention
 
-get rest api documention in pdf format by sending `GET /` to `HTTPAPI_LISTEN` address, or [find it](https://github.com/Sina-Ghaderi/goshkan/blob/main/apid/api.pdf) under `goshkan/apid/` directory.  
+get rest api documention in pdf format by sending `GET /` to `HTTPAPI_LISTEN` address, or [find it](https://github.com/Sina-Ghaderi/goshkan/blob/main/api/api.pdf) under `goshkan/apid/` directory.  
 this is open api without authentication, you shouldn't expose it to public, nginx or apache can protect this api with basic http authentication.
 
 ### security notice
